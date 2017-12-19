@@ -6,6 +6,8 @@
 import numpy as np
 import csv
 from copy import deepcopy
+import matplotlib.pyplot as plt
+
 
 class bar(object):
     ''' A bar of chocolate is the playing surface for chomp.
@@ -26,10 +28,17 @@ class bar(object):
     def __init__(self, rows=3, cols=4):
         self.rows = rows
         self.cols = cols
-        self.eaten = np.zeros([rows, cols])  # zero = not yet eaten
+        self.eaten = np.zeros([rows, cols], dtype=int)  # zero = not yet eaten
         self.allPositions = self.enum()
-        #self.allPositions = self.getAllPositionsFromCSV()
+        # self.allPositions = self.getAllPositionsFromCSV()
         self.finished = False  # game over
+        self.boxes = self.getBoxes()
+        self.gamesPlayed = 0
+        self.gamesWon = 0
+
+    def resetEaten(self):
+        self.eaten = np.zeros([self.rows, self.cols], dtype=int)
+        # zero = not yet eaten
 
     def enum(self):
         """ Enumerates all possible board positions
@@ -51,56 +60,61 @@ class bar(object):
         rows = self.rows
         cols = self.cols
         fullList = []
-        current = np.zeros([cols,1],dtype=int)
+        current = np.zeros([cols, 1], dtype=int)
         q = deepcopy(current.T)
         fullList.append(q)
-        check = -1 # index of position to first look at
-        while current[0] <= rows: # loop until higher number than rows
-    #        print('Current = {}'.format(current.T))
-    #        print('Check = {}'.format(check))
-            if current[check] == current[check-1]: # if the current pair are same
-    #            print('Current pair are the same')
-                if check-1 != -1*cols: # and this isn't the last pair
-    #                print('This isn''t the last pair')
-                    check -= 1 # compare a pair higher
+        check = -1  # index of position to first look at
+        while current[0] <= rows:  # loop until higher number than rows
+            if current[check] == current[check-1]:  # if pair are the same
+                if check-1 != -1*cols:  # and this isn't the last pair
+                    check -= 1  # compare a pair higher
                 else:
-    #                print('This is the last pair')
-                    current[0] += 1;
-                    current[1:] = 0;
+                    current[0] += 1
+                    current[1:] = 0
                     check = -1
                     q = deepcopy(current.T)
                     fullList.append(q)
-    #                print('After copy Current = {}'.format(current.T))
-            else: #current pair are not the same
-                if current[check] <= current[check-1]-1: # rollover condition
-    #                print('Rollover')
-                    current[check] += 1;
+            else:  # current pair are not the same
+                if current[check] <= current[check-1]-1:  # rollover condition
+                    current[check] += 1
                     if check != -1:
-                        current[check+1:] = 0
-                else:
-    #                print('No Rollover')
-                    current[check] +=1;
+                        current[check+1:] = 0  # set end digits to zero
+                else:  # no rollover of digits
+                    current[check] += 1
                 q = deepcopy(current.T)
                 fullList.append(q)
                 check = -1
-    #            print('After Copy current = {}'.format(current.T))
         check = -1
 
-        f = fullList[:-1]#last element is not valid
-        boolRep = np.zeros([rows*cols,len(f)]) # boolean representation
-        for j,desc in enumerate(f):
-            desc = np.squeeze(desc);
+        f = fullList[:-1]  # last element is not valid
+        boolRep = np.zeros([rows*cols, len(f)])  # boolean representation
+        for j, desc in enumerate(f):
+            desc = np.squeeze(desc)
             for i in range(cols):
-                boolRep[i::cols,j] = np.concatenate((np.zeros([desc[i]]),np.ones([rows-desc[i]])))
-
+                boolRep[i::cols, j] = np.concatenate(
+                        (np.zeros([desc[i]]), np.ones([rows-desc[i]])))
         return boolRep.T.astype('bool')
 
+    def convertDescriptionToBoolean(self, desc):
+        '''Converts a description of a board, like [3,3,2,0] to a boolean
+        representation, [0,0,0,1,0,0,0,1,0,0,1,1]'''
+        cols = self.cols
+        rows = self.rows
+        boolRep = np.zeros([rows*cols])  # boolean representation
+        desc = np.squeeze(desc)
+        for i in range(cols):
+            boolRep[i::cols] = np.concatenate(
+                (np.zeros(desc[i]), np.ones([rows-desc[i]])))
+        return boolRep.astype('bool')
+
+    def convertBooleanToDescription(self, boolRep):
+        '''Converts a boolean representation like [0,0,0,1,0,0,0,1,0,0,1,1]
+        into a description like [3,3,2,0]'''
+        return np.sum(np.invert(boolRep.reshape(3, 4)).astype('int'), 0)
 
     def getAllPositionsFromCSV(self):
         '''Returns a boolean array of board positions -
         elements true if eaten'''
-
-
         with open('chomp.csv', 'r') as csvfile:
             myreader = csv.reader(csvfile, delimiter=',')
             boardPositions = np.zeros([35, 12])
@@ -131,10 +145,10 @@ class bar(object):
     def eat(self, n, player):
         """"Sets the eaten property of the bar, from some coordinate position
         specified by n"""
-        print('Player {} chose to eat square {}'.format(player,n))
+       # print('Player {} chose to eat square {}'.format(player, n))
         if n == 0:
-            print('square 0 is poisoned so Player {} loses'.format(player))
-            self.finished = True
+           # print('square 0 is poisoned so Player {} loses'.format(player))
+            self.eaten = np.zeros(self.rows,self.cols)
         else:
             topLeftPosition = self.positionNumberToCoords(n)
             if self.eaten[topLeftPosition] == 0:
@@ -146,15 +160,13 @@ class bar(object):
                 squaresToEat = np.logical_and(squaresAlreadyEatenFilter, filt)
                 self.eaten[squaresToEat] = player
             else:
-                print('That square is already eaten')
-            print(self.eaten)
-
+                pass
             if len(np.nonzero(self.eaten)) == (self.rows*self.cols)-1:
-                print('Player {} wins'.format(player))
+                #   print('Player {} wins'.format(player))
                 self.finished = True
-            print('After eating, my state is {}'
-                  .format(self.recognisePosition()))
-            print('\n')
+                #  print('After eating, my state is {}'
+                # .format(self.recognisePosition()))
+                #  print('\n')
         return self.eaten
 
     def positionNumberToCoords(self, n):
@@ -171,11 +183,263 @@ class bar(object):
         allMoves = np.arange(0, 12)
         boardID = self.recognisePosition()
         availableMoves = allMoves[np.invert(self.allPositions[boardID, :])]
-        return np.random.choice(availableMoves, 1)
+        availableMoves = availableMoves[availableMoves != 0]
+        # remove the chance of zeroing
+        if len(availableMoves) == 0:
+            move = -1  # resign
+        else:
+            move = int(np.random.choice(availableMoves, 1))
+        return move
 
     def demo(self):
         '''makes player 1 eat the bottom 2x2 square'''
         self.eaten[1:3, 2:4] = 1
+
+    def getBoxes(self):
+        listOfBoxes = []
+        for boolean in self.allPositions:
+            description = self.convertBooleanToDescription(boolean)
+            listOfBoxes.append(Box(description, self.rows, self.cols))
+        return listOfBoxes
+
+    def record(self):
+        print('PC has won {} of {} games - {:.0f} percent'.format(
+            self.gamesWon,
+            self.gamesPlayed,
+            (self.gamesWon/self.gamesPlayed)*100))
+        return self.gamesWon/self.gamesPlayed
+
+    def playHuman(self):
+        '''Play the game of Chomp against the human - PC starts (player 1)
+
+        Strategy: Starts with a random move, then draw moves thereafter.
+        Log moves and boxes as we go
+        If we win, replenish the boxes we used
+        If we lose, replenish the boxes the human used
+
+        '''
+        pcMoveList = []
+        humanMoveList = []
+        positionList = []
+        self.resetEaten()  # reset which boxes have been eaten
+        self.gamesPlayed += 1
+
+        current = self.recognisePosition()
+        positionList.append(current)
+        move = self.boxes[current].draw()
+        self.eat(move, 1)
+        print('After eating, my state is {}'
+              .format(self.recognisePosition()))
+        print(self.eaten)
+        pcMoveList.append(move)
+        player1In = False  # in the loop, it's the human's turn
+        winner = -1  # don't know the winner yet
+        self.finished = False
+        while self.finished is False:
+            if player1In:
+                current = self.recognisePosition()
+                positionList.append(current)
+                move = self.boxes[current].draw()
+                move = int(move)
+                if move == -1:
+                    self.finished = True
+                    winner = 2  # player 1 resigned
+                    print('Player 1 Resigned')
+                else:
+                    self.eat(move, 1)
+                    pcMoveList.append(move)
+                    player1In = False
+            else:
+                current = self.recognisePosition()
+                positionList.append(current)
+                self.show()
+                print(self.eaten)
+                move = input(
+                        'Which square would you like to go in? '
+                        '(-1 to resign), blank for random ')
+                try:
+                    move = int(move)
+                except ValueError:
+                    move = -2  # set to -2 if left blank
+                if move == -1:
+                    move = int(move)
+                    self.finished = True
+                    winner = 1  # player 2 resigned
+                    print('Player 2 Resigned')
+                    player1In = True  # do I need this?
+                elif move == -2:
+                    move = self.pickRandomAvailableSquareToEat()
+                    print('Player 2 Randomly chose {}'.format(move))
+                    if move != -1:  # any move but resignation
+                        self.eat(move, 2)
+                        humanMoveList.append(move)
+                        player1In = True
+                    else:  # resignation
+                        self.finished = True
+                        winner = 1  # player 2 resigned
+                        print('Player 2 Resigned')
+                        player1In = True  # not sure if I need this
+                else:
+                    move = int(move)
+                    if move == 0:
+                        print('Player 2 ate the poison')
+                        self.finished = True
+                        winner = 1
+                        player1In = True
+                    else:
+                        self.eat(move, 2)
+                        humanMoveList.append(move)
+                        player1In = True
+        print('Player {} won'.format(winner))
+        print('Position List = {}'.format(positionList))
+        print('PC Moves = {}'.format(pcMoveList))
+        print('Human Moves = {}'.format(humanMoveList))
+        if winner == 1:  # the computer wins
+            winPositionList = positionList[::2]
+            winMoveList = pcMoveList
+            self.gamesWon += 1
+        else:
+            winPositionList = positionList[1::2]
+            winMoveList = humanMoveList
+        for move, position in zip(winMoveList, winPositionList):
+                print('Boosting move {} in box {}'.format(move, position))
+                self.boxes[position].replenish(move)
+        return winner
+
+    def playRandomOpponent(self):
+        '''Play the game of Chomp against a random opponent
+
+        Strategy: draws moves from the distribution
+        Log moves and boxes as we go
+        If we win, replenish the boxes we used
+        If we lose, replenish the boxes the human used
+
+        '''
+        pcMoveList = []
+        humanMoveList = []
+        positionList = []
+        self.resetEaten()  # reset which boxes have been eaten
+        self.gamesPlayed += 1
+
+        current = self.recognisePosition()
+        positionList.append(current)
+        move = self.boxes[current].draw()
+        self.eat(move, 1)
+        pcMoveList.append(move)
+        player1In = False  # in the loop, it's the human's turn
+        winner = -1  # don't know the winner yet
+        self.finished = False
+        while self.finished is False:
+            if player1In:
+                current = self.recognisePosition()
+                positionList.append(current)
+                move = self.boxes[current].draw()
+                move = int(move)
+                if move == -1:
+                    self.finished = True
+                    winner = 2  # player 1 resigned
+                else:
+                    self.eat(move, 1)
+                    pcMoveList.append(move)
+                    player1In = False
+            else:
+                current = self.recognisePosition()
+                positionList.append(current)
+                move = self.pickRandomAvailableSquareToEat()
+                if move != -1:  # any move but resignation
+                    self.eat(move, 2)
+                    humanMoveList.append(move)
+                    player1In = True
+                else:  # resignation
+                    self.finished = True
+                    winner = 1  # player 2 resigned
+                    player1In = True  # not sure if I need this
+        if winner == 1:  # the computer wins
+            winPositionList = positionList[::2]
+            winMoveList = pcMoveList
+            self.gamesWon += 1
+        else:
+            winPositionList = positionList[1::2]
+            winMoveList = humanMoveList
+        for move, position in zip(winMoveList, winPositionList):
+                self.boxes[position].replenish(move)
+        return winner
+
+
+class Box(object):
+    '''Each bar has as many boxes as possible game states - possible moves are
+    drawn from the box
+
+    Box methods:
+        init - initialise contents depending on description
+        repr - prints the dictionary
+        populate - initialise internal dictionary with the right number moves
+        distribution - calculates the number of beads to start in each box
+        draw - return a move or -1 for resign
+        replenish - add beads to winning moves
+    '''
+
+    def __init__(self, desc, rows, cols):
+        self.desc = np.squeeze(desc)  # to ensure a single dimensional array
+        self.cols = cols
+        self.rows = rows
+        self.moveDict = {}  # create an empty dictionary to store move/beads
+        self.populate()  # populate this dictionary with moves
+
+    def __repr__(self):
+        return(repr(self.moveDict))
+
+    def populate(self):
+        '''Populates the dictionary of available moves'''
+        desc = np.squeeze(self.desc)
+        boolRep = np.zeros([self.rows*self.cols])  # 1 for eaten, 0 for not
+        for i in range(self.cols):
+            boolRep[i::self.cols] = np.concatenate(
+                    (np.zeros([desc[i]]), np.ones([self.rows-desc[i]])))
+        boolRep = (1-boolRep).astype('bool')
+        allMoves = np.arange(self.rows*self.cols)
+        availableMoves = allMoves[boolRep]
+        numberOfBeadsEach = self.distribution()
+        for move in availableMoves:
+            self.moveDict[move] = numberOfBeadsEach
+        try:
+            self.moveDict.pop(0)  # force remove the 0 move which loses
+        except KeyError:  # this occurs when trying to populate the empty board
+            pass
+
+    def distribution(self):
+        '''Controls how many initial beads get placed in each box,
+        depending on how far into the game they are
+
+        This is governed by the sum of the description (how many squares are
+        left over and maxBeads and minBeads)
+        '''
+        maxBeads = 6
+        minBeads = 2
+        maxSum = self.rows * self.cols
+        totalSquaresLeft = np.sum(self.desc)
+        return np.ceil(np.interp(
+                totalSquaresLeft, [0, maxSum],
+                [minBeads, maxBeads])).astype(int)
+
+    def draw(self):
+        '''Draws a move from all possible moves available from this box'''
+        moveList = []
+        for k in self.moveDict:
+            for i in range(self.moveDict[k]):
+                moveList.append(k)  # add the move this many times
+        try:  # choose one from the dictionary
+            selected = int(np.random.choice(moveList, 1))
+            self.moveDict[selected] -= 1  # decrement
+        except ValueError:  # there are no possible moves
+            selected = -1  # resign as no possible moves
+            self.populate()  # reset to original
+        return selected
+
+    def replenish(self,winningMove):
+        '''Adds to the dictionary the list of moves which won the game'''
+        bounty = 3;  # add this to each winning position
+        self.moveDict[winningMove] += bounty
 
 
 if __name__ == '__main__':
@@ -193,28 +457,27 @@ if __name__ == '__main__':
 
 
     # enough demos, let's play some games
-    p1Wins = 0;
-    nGames = 100;
-    for i in range(nGames):
-        d = bar()
-        player = 1
-        player1In=True
-        while d.finished == False:
-            if player1In:
-                player = 1
-            else:
-                player = 2
-            sq2Eat = int(d.pickRandomAvailableSquareToEat())
-            d.eat(sq2Eat,player)
-            player1In = not(player1In)
-        p1Wins += player-1
-
-
-    print('Player 1 won {} times out of {} games'.format(p1Wins,nGames))
-# with entirely random play, there seems to be no advantage to going first
-
-
-    print('\n\n\n')
+    if False:
+        p1Wins = 0;
+        nGames = 100;
+        for i in range(nGames):
+            d = bar()
+            player = 1
+            player1In=True
+            while d.finished == False:
+                if player1In:
+                    player = 1
+                else:
+                    player = 2
+                sq2Eat = int(d.pickRandomAvailableSquareToEat())
+                d.eat(sq2Eat,player)
+                player1In = not(player1In)
+            p1Wins += player-1
+        print('Player 1 won {} times out of {} games'.format(p1Wins,nGames))
+## with entirely random play, there seems to be no advantage to going first
+#
+#
+#    print('\n\n\n')
 #    # game against a human opponent
 #    d = bar()
 #    player = 1
@@ -233,4 +496,35 @@ if __name__ == '__main__':
 #            d.eat(q, 2)
 #            player1In = True
 
-    q = bar(5,4)
+#    if False:
+#        d = bar()
+#        go = True
+#        gameIdx = 0
+#        gameList = []
+#        recordList = []
+#        while go:
+#            d.playHuman()
+#            gameList.append(gameIdx)
+#            recordList.append(d.record())
+#            gameIdx += 1
+#            raw = input('Hit Enter to go again, type anything to quit: ')
+#            if len(raw) != 0:
+#                go = False
+#        plt.figure(1)
+#        plt.plot(gameList, recordList, 'k-')
+#        plt.show()
+
+    e = bar()
+    gameIdx = 0
+    gameList = []
+    recordList = []
+    for i in range(10000):  # simulate 10000 games against random opposition
+        e.playRandomOpponent()
+        gameList.append(gameIdx)
+        recordList.append(e.record())
+        gameIdx += 1
+    plt.figure(2)
+    plt.plot(gameList, recordList, 'k-')
+    plt.show()
+
+
