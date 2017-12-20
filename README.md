@@ -2,7 +2,7 @@
 
 [Chomp](http://www.papg.com/show?3AEA) is a pencil-and-paper territorial game for two players, conventionally played on a 3x4 grid representing a delicious chocolate bar. Players take it in turns to bite off rectangular regions from the lower right corner, aiming for the other player to eat the last square, which is tainted with a deadly neurotoxin.
 
-![GIF of the game of chomp](chomp.gif)
+![GIF of the game of chomp](Art/chomp.gif)
 
 With 3 rows and 4 columns, the game has a total of 34 states, which makes it a candidate for a simple machine-learning demonstration, in the same vein as the [MENACE](https://github.com/mscroggs/MENACE) machine.
 
