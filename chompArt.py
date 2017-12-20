@@ -28,7 +28,7 @@ for i, state in enumerate(states):
                 img = bad
             else:
                 img = sqr
-            if state[j, k] == False:
+            if not state[j, k]:
                 imageArray[j*pixSize:(j+1)*pixSize,
                            k*pixSize:(k+1)*pixSize, :] = img
                 sp.misc.imsave('Art/{}.jpg'.format(i), imageArray)
