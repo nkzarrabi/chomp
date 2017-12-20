@@ -1,5 +1,6 @@
 """Investigative Script on the game of Chomp"""
 import csv
+import pickle
 from copy import deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
@@ -55,6 +56,8 @@ class Bar(object):
         getBoxes() : Generate a list of Box objects for the bar
         record() : Print the number of games won and played and return the
                    percentage.
+        save(filename) : Saves the current box array to a file 'filename'
+        load(filename) : Loads a box array from the file 'filename'
         playHuman() : Play chomp against a human competitor.
         playRandom() : Play chomp against a random adversary.
 
@@ -206,11 +209,35 @@ class Bar(object):
 
     def show(self):
         """Prints a visual representation of the bar with numbers on squares"""
+        print('Square Numbers')
         for i in range(self.rows):
             print('|', end='')
             for j in range(self.cols):
                 print('{:2}|'.format(j+i*self.cols), end='')
             print('')
+        print('')
+
+    def showUnicode(self):
+        """Draws a bar on the screen using unicode block elements"""
+        print('Current squares which have been eaten')
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.eaten[i, j] == 0:
+                    print('██', end='')
+                else:
+                    print('░░', end='')
+            print('')
+        print('')
+
+    def showEaten(self):
+        """Prints a representation of which parts of the bar have been eaten"""
+        print('Current squares which have been eaten')
+        for i in range(self.rows):
+            print('|', end='')
+            for j in range(self.cols):
+                print('{:2}|'.format(self.eaten[i, j]), end='')
+            print('')
+        print('')
 
     def eat(self, n, player):
         """"Sets the eaten property of the bar, from some coordinate position
@@ -283,6 +310,17 @@ class Bar(object):
             (self.gamesWon/self.gamesPlayed)*100))
         return self.gamesWon/self.gamesPlayed
 
+    def save(self, filename):
+        """Pickles the current array of box objects"""
+        with open(filename, 'wb') as f:
+            pickle.dump(self.boxes, f)
+
+    def load(self, filename):
+        """Retrieves an array of box objects"""
+        with open(filename, 'rb') as f:
+            boxData = pickle.load(f)
+            self.boxes = boxData
+
     def playHuman(self):
         """Play the game of Chomp against the human - PC starts (player 1)
 
@@ -325,8 +363,8 @@ class Bar(object):
             else:
                 current = self.recogniseState()
                 positionList.append(current)
+                self.showEaten()
                 self.show()
-                print(self.eaten)
                 move = input(
                     'Which square would you like to go in? '
                     '(-1 to resign), blank for random ')
@@ -389,7 +427,7 @@ class Bar(object):
             If we lose, replenish the boxes the random player used
         """
         pcMoveList = []
-        humanMoveList = []
+        randomMoveList = []
         positionList = []
         self.resetEaten()  # reset which boxes have been eaten
         self.gamesPlayed += 1
@@ -421,7 +459,7 @@ class Bar(object):
                 move = self.pickRandomAvailableSquareToEat()
                 if move != -1:  # any move but resignation
                     self.eat(move, 2)
-                    humanMoveList.append(move)
+                    randomMoveList.append(move)
                     player1In = True
                 else:  # resignation
                     self.finished = True
@@ -433,7 +471,67 @@ class Bar(object):
             self.gamesWon += 1
         else:
             winPositionList = positionList[1::2]
-            winMoveList = humanMoveList
+            winMoveList = randomMoveList
+        for move, position in zip(winMoveList, winPositionList):
+                self.boxes[position].replenish(move)
+        return winner
+
+    def playIntelligentOpponent(self):
+        """Play the game of Chomp against an opponent who is learning with the
+        same weights as you.
+
+        Strategy:
+            draws moves from the distribution
+            Log moves and boxes as we go
+            If we win, replenish the boxes we used
+            If we lose, replenish the boxes the random player used
+        """
+        pcMoveList = []
+        pcMoveList2 = []
+        positionList = []
+        self.resetEaten()  # reset which boxes have been eaten
+        self.gamesPlayed += 1
+
+        current = self.recogniseState()
+        positionList.append(current)
+        move = self.boxes[current].draw()
+        self.eat(move, 1)
+        pcMoveList.append(move)
+        player1In = False  # in the loop, it's the human's turn
+        winner = -1  # don't know the winner yet
+        self.finished = False
+        while self.finished is False:
+            if player1In:
+                current = self.recogniseState()
+                positionList.append(current)
+                move = self.boxes[current].draw()
+                move = int(move)
+                if move == -1:
+                    self.finished = True
+                    winner = 2  # player 1 resigned
+                else:
+                    self.eat(move, 1)
+                    pcMoveList.append(move)
+                    player1In = False
+            else:
+                current = self.recogniseState()
+                positionList.append(current)
+                move = self.boxes[current].draw()
+                move = int(move)
+                if move == -1:
+                    self.finished = True
+                    winner = 1  # player 2 resigned
+                else:
+                    self.eat(move, 2)
+                    pcMoveList2.append(move)
+                    player1In = True
+        if winner == 1:  # the first computer wins
+            winPositionList = positionList[::2]
+            winMoveList = pcMoveList
+            self.gamesWon += 1
+        else:  # the second computer wins
+            winPositionList = positionList[1::2]
+            winMoveList = pcMoveList2
         for move, position in zip(winMoveList, winPositionList):
                 self.boxes[position].replenish(move)
         return winner
@@ -441,7 +539,7 @@ class Bar(object):
 
 class Box(object):
     '''Each bar has as many boxes as possible game states - possible moves are
-    drawn from the box
+    represented as beads, which are drawn from the box.
 
     Box methods:
         init - initialise contents depending on description
@@ -606,3 +704,21 @@ if __name__ == '__main__':
     plt.plot(gameList, recordList, '-')
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
+    plt.title('Training against Random opposition')
+
+    f = Bar()
+    gameIdx = 0
+    gameList = []
+    recordList = []
+    w = []
+    for i in range(200):  # simulate games against random opposition
+        w.append(f.playRandomOpponent())
+        gameList.append(gameIdx)
+        recordList.append(f.record())
+        gameIdx += 1
+
+    plt.figure(5)
+    plt.plot(gameList, recordList, '-')
+    plt.xlabel('Time')
+    plt.ylabel('Probability of win')
+    plt.title('Dual Phase Training')
