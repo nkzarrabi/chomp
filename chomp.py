@@ -94,7 +94,7 @@ class Bar(object):
         Out: array([3, 2, 2, 0])
 
     """
-    def __init__(self, rows=3, cols=4, bounty=3, maxBeads=6, minBeads=2):
+    def __init__(self, rows=3, cols=4, bounty=3, maxBeads=2, minBeads=2):
         self.rows = rows
         self.cols = cols
         self.eaten = np.zeros([rows, cols], dtype=int)
@@ -550,7 +550,7 @@ class Box(object):
         replenish - add beads to winning moves
     '''
 
-    def __init__(self, desc, rows=3, cols=4, bounty=3, maxBeads=6, minBeads=2):
+    def __init__(self, desc, rows=3, cols=4, bounty=3, maxBeads=2, minBeads=2):
         self.desc = np.squeeze(desc)  # to ensure a single dimensional array
         self.cols = cols
         self.rows = rows
@@ -688,13 +688,13 @@ if __name__ == '__main__':
     e = Bar(rows=3,
             cols=4,
             bounty=3,
-            maxBeads=3,
-            minBeads=1)
+            maxBeads=2,
+            minBeads=2) # this is default
     gameIdx = 0
     gameList = []
     recordList = []
     w = []
-    for i in range(200):  # simulate games against random opposition
+    for i in range(2000):  # simulate games against random opposition
         w.append(e.playRandomOpponent())
         gameList.append(gameIdx)
         recordList.append(e.record())
@@ -705,13 +705,14 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
     plt.title('Training against Random opposition')
+    e.save('2000GamesRandom.pkl')
 
     f = Bar()
     gameIdx = 0
     gameList = []
     recordList = []
     w = []
-    for i in range(200):  # simulate games against random opposition
+    for i in range(2000):  # simulate games against random opposition
         w.append(f.playRandomOpponent())
         gameList.append(gameIdx)
         recordList.append(f.record())
@@ -722,3 +723,4 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
     plt.title('Dual Phase Training')
+    f.save('2000GamesIntelligent.pkl')
