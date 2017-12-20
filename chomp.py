@@ -342,7 +342,7 @@ class Bar(object):
         for i in range(nStates):
             plt.subplot(sz, sz, i+1)
             g = dict2Grid(self.boxes[i], self.rows, self.cols)
-            plt.imshow(g/(np.nanmax(g)),
+            plt.imshow(g/(np.nansum(g)),
                        cmap='viridis', vmin=0, vmax=1)
             plt.ylabel('State {}'.format(i))
             plt.colorbar()
