@@ -342,7 +342,8 @@ class Bar(object):
         for i in range(nStates):
             plt.subplot(sz, sz, i+1)
             g = dict2Grid(self.boxes[i], self.rows, self.cols)
-            plt.imshow(g/np.nanmax(g), cmap='viridis', vmin=0, vmax=1)
+            plt.imshow(g/(np.nanmax(g)),
+                       cmap='viridis', vmin=0, vmax=1)
             plt.ylabel('State {}'.format(i))
             plt.colorbar()
 
@@ -732,13 +733,13 @@ if __name__ == '__main__':
     plt.title('Training against Random opposition')
     # e.save('2000GamesRandom.pkl')
 
-    f = Bar()
+    f = Bar(maxBeads=6)
     gameIdx = 0
     gameList = []
     recordList = []
     w = []
-    for i in range(2000):  # simulate games against random opposition
-        w.append(f.playRandomOpponent())
+    for i in range(2000):  # simulate against intelligent opposition
+        w.append(f.playIntelligentOpponent())
         gameList.append(gameIdx)
         recordList.append(f.record())
         gameIdx += 1
@@ -749,3 +750,4 @@ if __name__ == '__main__':
     plt.ylabel('Probability of win')
     plt.title('Dual Phase Training')
     # f.save('2000GamesIntelligent.pkl')
+    f.showBoxChoices()
