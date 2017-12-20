@@ -321,6 +321,31 @@ class Bar(object):
             boxData = pickle.load(f)
             self.boxes = boxData
 
+    def showBoxChoices(self):
+        """Graphically represents the chance of choosing a particular move
+        based on the current state of self.boxes"""
+
+        def dict2Grid(d, rows, cols):
+            grid = np.zeros([rows*cols])
+            for i in range(rows*cols):
+                try:
+                    grid[i] = d.moveDict[i]
+                except KeyError:
+                    grid[i] = np.nan
+            grid = np.reshape(grid, [rows, cols])
+            return grid
+
+        nStates = len(self.allStates)
+        sz = np.ceil(np.sqrt(nStates))
+        plt.figure()
+        plt.suptitle('Probability of choosing a square')
+        for i in range(nStates):
+            plt.subplot(sz, sz, i+1)
+            g = dict2Grid(self.boxes[i], self.rows, self.cols)
+            plt.imshow(g/np.nanmax(g), cmap='viridis', vmin=0, vmax=1)
+            plt.ylabel('State {}'.format(i))
+            plt.colorbar()
+
     def playHuman(self):
         """Play the game of Chomp against the human - PC starts (player 1)
 
@@ -437,7 +462,7 @@ class Bar(object):
         move = self.boxes[current].draw()
         self.eat(move, 1)
         pcMoveList.append(move)
-        player1In = False  # in the loop, it's the human's turn
+        player1In = False  # in the loop, it's the opponent's turn first
         winner = -1  # don't know the winner yet
         self.finished = False
         while self.finished is False:
@@ -689,7 +714,7 @@ if __name__ == '__main__':
             cols=4,
             bounty=3,
             maxBeads=2,
-            minBeads=2) # this is default
+            minBeads=2)  # this is default
     gameIdx = 0
     gameList = []
     recordList = []
@@ -705,7 +730,7 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
     plt.title('Training against Random opposition')
-    e.save('2000GamesRandom.pkl')
+    # e.save('2000GamesRandom.pkl')
 
     f = Bar()
     gameIdx = 0
@@ -723,4 +748,4 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
     plt.title('Dual Phase Training')
-    f.save('2000GamesIntelligent.pkl')
+    # f.save('2000GamesIntelligent.pkl')
