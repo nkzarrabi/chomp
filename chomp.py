@@ -347,6 +347,116 @@ class Bar(object):
             plt.ylabel('State {}'.format(i))
             plt.colorbar()
 
+    def play(self, opponent, display=False):
+        """Play the game of Chomp against an opponent
+        Generalised - takes argument 'opponent' to face either
+            'human'
+            'random'
+            'intelligent'
+        """
+
+        def humanMove():
+            """Ask the human for input, returns a valid move or -1"""
+            loop = True
+            self.show()
+            self.showEaten()
+            while loop:
+                move = input(
+                        'Which square would you like to go in? '
+                        '(-1 to resign), blank for random ')
+                try:
+                    move = int(move)  # convert all good inputs to int from str
+                except ValueError:
+                    move = self.pickRandomAvailableSquareToEat()
+                    print('Machine Randomly chose {}'.format(move))
+                if (move in self.boxes[self.recogniseState()].moveDict.keys()):
+                    return move
+                elif move == 0:
+                    print('It\'s all too much - resigned by eating poison')
+                    return -1
+                elif move == -1:
+                    print('Human Resigns')
+                    return -1
+                else:
+                    print('Invalid Input')
+
+        def randomMove():
+            """Select a random move from those available"""
+            move = self.pickRandomAvailableSquareToEat()  # positive int or -1
+            return move
+
+        def drawMove():
+            """Draw a move from the distribution"""
+            move = self.boxes[current].draw()
+            return move
+
+        # initialise constants
+        pcMoveList = []
+        opponentMoveList = []
+        positionList = []
+        self.resetEaten()  # reset which boxes have been eaten
+        self.gamesPlayed += 1
+        self.finished = False
+        winner = -1   # don't know the winner yet
+
+        # select opponent
+        if opponent.lower() == 'human':
+            moveFcn = humanMove
+        elif opponent.lower() == 'random':
+            moveFcn = randomMove
+        elif opponent.lower() == 'intelligent':
+            moveFcn = drawMove
+        else:
+            raise NameError('Unknown Opponent')
+
+        while self.finished is False:
+            # PC part
+            current = self.recogniseState()  # get current state
+            positionList.append(current)  # add this to list
+            move = drawMove()
+            if move == -1:  # Computer resigns
+                self.finished = True
+                winner = 2  # other player wins
+                break
+            else:  # Computer plays
+                self.eat(move, 1)
+                pcMoveList.append(move)
+
+            # Opponent part
+            current = self.recogniseState()
+            positionList.append(current)
+            move = moveFcn()
+            if move == -1:  # Opponent resigns
+                self.finished = True
+                winner = 1  # other player wins
+                break
+            else:  # Opponent plays
+                self.eat(move, 2)
+                opponentMoveList.append(move)
+        if display:
+            print('Position List = {}'.format(positionList))
+            print('PC Moves = {}'.format(pcMoveList))
+            print('Opponent Moves = {}'.format(opponentMoveList))
+        if winner == 1:  # the computer wins
+            if display:
+                print('THE COMPUTER WINS'.format(winner))
+            winPositionList = positionList[::2]
+            winMoveList = pcMoveList
+            self.gamesWon += 1
+        else:  # the opponent wins
+            if display:
+                print('OPPONENT WINS -'
+                      'Computer gets no bonus for being beaten!')
+            # winPositionList = positionList[1::2]
+            winPositionList = []
+            # winMoveList = humanMoveList
+            winMoveList = []
+        for move, position in zip(winMoveList, winPositionList):
+            if display:
+                print('Boosting move {} in box {}'.format(move, position))
+            self.boxes[position].replenish(move)
+        return winner
+
     def playHuman(self):
         """Play the game of Chomp against the human - PC starts (player 1)
 
@@ -435,9 +545,11 @@ class Bar(object):
             winPositionList = positionList[::2]
             winMoveList = pcMoveList
             self.gamesWon += 1
-        else:
-            winPositionList = positionList[1::2]
-            winMoveList = humanMoveList
+        else:  # the person wins
+            # winPositionList = positionList[1::2]
+            winPositionList = []
+            # winMoveList = humanMoveList
+            winMoveList = []
         for move, position in zip(winMoveList, winPositionList):
                 print('Boosting move {} in box {}'.format(move, position))
                 self.boxes[position].replenish(move)
@@ -721,7 +833,7 @@ if __name__ == '__main__':
     recordList = []
     w = []
     for i in range(2000):  # simulate games against random opposition
-        w.append(e.playRandomOpponent())
+        w.append(e.play('random', display=False))
         gameList.append(gameIdx)
         recordList.append(e.record())
         gameIdx += 1
@@ -731,7 +843,7 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
     plt.title('Training against Random opposition')
-   # e.save('2000GamesRandom.pkl')
+    # e.save('2000GamesRandom.pkl')
     e.showBoxChoices()
 
     f = Bar(maxBeads=6)
@@ -740,7 +852,7 @@ if __name__ == '__main__':
     recordList = []
     w = []
     for i in range(2000):  # simulate against intelligent opposition
-        w.append(f.playIntelligentOpponent())
+        w.append(f.play('intelligent', display=False))
         gameList.append(gameIdx)
         recordList.append(f.record())
         gameIdx += 1
@@ -750,5 +862,5 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
     plt.title('Dual Phase Training')
-   # f.save('2000GamesIntelligent.pkl')
+    # f.save('2000GamesIntelligent.pkl')
     f.showBoxChoices()
