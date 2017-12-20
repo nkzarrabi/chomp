@@ -4,6 +4,9 @@
 
 With 3 rows and 4 columns, the game has a total of 34 states, which makes it a candidate for a simple machine-learning demonstration, in the same vein as the [MENACE](https://github.com/mscroggs/MENACE) machine.
 
-The 50GamesHuman.pkl file contains the state of the machine after 50 games against a human, starting with 2 beads in each box. The 2000Games#.pkl files contain the machine state after facing a random opponent, or another 'intelligent' opponent using the same strategy. 
+The 50GamesHuman.pkl file contains the state of the machine after 50 games against a human, starting with 2 beads in each box. The 2000Games#.pkl files contain the machine state after facing a random opponent, or another 'intelligent' opponent using the same strategy.
+
+![State transition probability diagram](ProbChooseSquare.png)
+This image shows the relative probability of choosing a square on a colour scale, after 50 training games against a human.
 
 This may turn into an NGCM outreach demonstration if it turns out to be successful.
