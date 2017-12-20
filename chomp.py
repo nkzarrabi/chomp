@@ -731,7 +731,8 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
     plt.title('Training against Random opposition')
-    # e.save('2000GamesRandom.pkl')
+   # e.save('2000GamesRandom.pkl')
+    e.showBoxChoices()
 
     f = Bar(maxBeads=6)
     gameIdx = 0
@@ -749,5 +750,5 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Probability of win')
     plt.title('Dual Phase Training')
-    # f.save('2000GamesIntelligent.pkl')
+   # f.save('2000GamesIntelligent.pkl')
     f.showBoxChoices()

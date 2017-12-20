@@ -18,7 +18,8 @@ c = a.cols
 sqr = sp.misc.imread('Art/square.jpg')
 bad = sp.misc.imread('Art/badSquare.jpg')
 pixSize = sqr.shape[0]
-
+imageArray = np.ones([r*pixSize, c*pixSize, sqr.shape[2]])
+sp.misc.imsave('Art/0.jpg',imageArray)
 for i, state in enumerate(states):
     state = np.reshape(state, [r, c])
     imageArray = np.ones([r*pixSize, c*pixSize, sqr.shape[2]])
