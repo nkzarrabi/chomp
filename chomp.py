@@ -457,223 +457,6 @@ class Bar(object):
             self.boxes[position].replenish(move)
         return winner
 
-    def playHuman(self):
-        """Play the game of Chomp against the human - PC starts (player 1)
-
-        Strategy:
-            Draw a move from the box corresponding with the current state
-            Log moves made and states visited as we go
-            If we win, replenish the boxes we used with the bounty
-            If we lose, replenish the boxes the human used
-        """
-        pcMoveList = []
-        humanMoveList = []
-        positionList = []
-        self.resetEaten()  # reset which boxes have been eaten
-        self.gamesPlayed += 1
-
-        current = self.recogniseState()
-        positionList.append(current)
-        move = self.boxes[current].draw()
-        self.eat(move, 1)
-        print('After eating, my state is {}'
-              .format(self.recogniseState()))
-        pcMoveList.append(move)
-        player1In = False  # in the loop, it's the human's turn
-        winner = -1  # don't know the winner yet
-        self.finished = False
-        while self.finished is False:
-            if player1In:
-                current = self.recogniseState()
-                positionList.append(current)
-                move = self.boxes[current].draw()
-                move = int(move)
-                if move == -1:
-                    self.finished = True
-                    winner = 2  # player 1 resigned
-                    print('Player 1 Resigned')
-                else:
-                    self.eat(move, 1)
-                    pcMoveList.append(move)
-                    player1In = False
-            else:
-                current = self.recogniseState()
-                positionList.append(current)
-                self.showEaten()
-                self.show()
-                move = input(
-                    'Which square would you like to go in? '
-                    '(-1 to resign), blank for random ')
-                try:
-                    move = int(move)
-                except ValueError:
-                    move = -2  # set to -2 if left blank
-                if move == -1:
-                    move = int(move)
-                    self.finished = True
-                    winner = 1  # player 2 resigned
-                    print('Player 2 Resigned')
-                    player1In = True  # do I need this?
-                elif move == -2:
-                    move = self.pickRandomAvailableSquareToEat()
-                    print('Player 2 Randomly chose {}'.format(move))
-                    if move != -1:  # any move but resignation
-                        self.eat(move, 2)
-                        humanMoveList.append(move)
-                        player1In = True
-                    else:  # resignation
-                        self.finished = True
-                        winner = 1  # player 2 resigned
-                        print('Player 2 Resigned')
-                        player1In = True  # not sure if I need this
-                else:
-                    move = int(move)
-                    if move == 0:
-                        print('Player 2 ate the poison')
-                        self.finished = True
-                        winner = 1
-                        player1In = True
-                    else:
-                        self.eat(move, 2)
-                        humanMoveList.append(move)
-                        player1In = True
-        print('Player {} won'.format(winner))
-        print('Position List = {}'.format(positionList))
-        print('PC Moves = {}'.format(pcMoveList))
-        print('Human Moves = {}'.format(humanMoveList))
-        if winner == 1:  # the computer wins
-            winPositionList = positionList[::2]
-            winMoveList = pcMoveList
-            self.gamesWon += 1
-        else:  # the person wins
-            # winPositionList = positionList[1::2]
-            winPositionList = []
-            # winMoveList = humanMoveList
-            winMoveList = []
-        for move, position in zip(winMoveList, winPositionList):
-                print('Boosting move {} in box {}'.format(move, position))
-                self.boxes[position].replenish(move)
-        return winner
-
-    def playRandomOpponent(self):
-        """Play the game of Chomp against a random opponent
-
-        Strategy:
-            draws moves from the distribution
-            Log moves and boxes as we go
-            If we win, replenish the boxes we used
-            If we lose, replenish the boxes the random player used
-        """
-        pcMoveList = []
-        randomMoveList = []
-        positionList = []
-        self.resetEaten()  # reset which boxes have been eaten
-        self.gamesPlayed += 1
-
-        current = self.recogniseState()
-        positionList.append(current)
-        move = self.boxes[current].draw()
-        self.eat(move, 1)
-        pcMoveList.append(move)
-        player1In = False  # in the loop, it's the opponent's turn first
-        winner = -1  # don't know the winner yet
-        self.finished = False
-        while self.finished is False:
-            if player1In:
-                current = self.recogniseState()
-                positionList.append(current)
-                move = self.boxes[current].draw()
-                move = int(move)
-                if move == -1:
-                    self.finished = True
-                    winner = 2  # player 1 resigned
-                else:
-                    self.eat(move, 1)
-                    pcMoveList.append(move)
-                    player1In = False
-            else:
-                current = self.recogniseState()
-                positionList.append(current)
-                move = self.pickRandomAvailableSquareToEat()
-                if move != -1:  # any move but resignation
-                    self.eat(move, 2)
-                    randomMoveList.append(move)
-                    player1In = True
-                else:  # resignation
-                    self.finished = True
-                    winner = 1  # player 2 resigned
-                    player1In = True  # not sure if I need this
-        if winner == 1:  # the computer wins
-            winPositionList = positionList[::2]
-            winMoveList = pcMoveList
-            self.gamesWon += 1
-        else:
-            winPositionList = positionList[1::2]
-            winMoveList = randomMoveList
-        for move, position in zip(winMoveList, winPositionList):
-                self.boxes[position].replenish(move)
-        return winner
-
-    def playIntelligentOpponent(self):
-        """Play the game of Chomp against an opponent who is learning with the
-        same weights as you.
-
-        Strategy:
-            draws moves from the distribution
-            Log moves and boxes as we go
-            If we win, replenish the boxes we used
-            If we lose, replenish the boxes the random player used
-        """
-        pcMoveList = []
-        pcMoveList2 = []
-        positionList = []
-        self.resetEaten()  # reset which boxes have been eaten
-        self.gamesPlayed += 1
-
-        current = self.recogniseState()
-        positionList.append(current)
-        move = self.boxes[current].draw()
-        self.eat(move, 1)
-        pcMoveList.append(move)
-        player1In = False  # in the loop, it's the human's turn
-        winner = -1  # don't know the winner yet
-        self.finished = False
-        while self.finished is False:
-            if player1In:
-                current = self.recogniseState()
-                positionList.append(current)
-                move = self.boxes[current].draw()
-                move = int(move)
-                if move == -1:
-                    self.finished = True
-                    winner = 2  # player 1 resigned
-                else:
-                    self.eat(move, 1)
-                    pcMoveList.append(move)
-                    player1In = False
-            else:
-                current = self.recogniseState()
-                positionList.append(current)
-                move = self.boxes[current].draw()
-                move = int(move)
-                if move == -1:
-                    self.finished = True
-                    winner = 1  # player 2 resigned
-                else:
-                    self.eat(move, 2)
-                    pcMoveList2.append(move)
-                    player1In = True
-        if winner == 1:  # the first computer wins
-            winPositionList = positionList[::2]
-            winMoveList = pcMoveList
-            self.gamesWon += 1
-        else:  # the second computer wins
-            winPositionList = positionList[1::2]
-            winMoveList = pcMoveList2
-        for move, position in zip(winMoveList, winPositionList):
-                self.boxes[position].replenish(move)
-        return winner
-
 
 class Box(object):
     '''Each bar has as many boxes as possible game states - possible moves are
@@ -753,114 +536,52 @@ class Box(object):
 
 
 if __name__ == '__main__':
-    #    b = bar()
-    #    b.show()
-    #    for i in range(12):
-    #        print('i= {} '.format(i), end='')
-    #        print(b.positionNumberToCoords(i))
-    #
-    #    print('\n\n\n')
-    #
-    #    b.eat(2, player=1)
-    #    b.eat(5, 2)
-    #    b.eat(1, 1)
 
-    # enough demos, let's play some games
-    if False:
-        p1Wins = 0
-        nGames = 100
-        for i in range(nGames):
-            d = Bar()
-            player = 1
-            player1In = True
-            while d.finished is False:
-                if player1In:
-                    player = 1
-                else:
-                    player = 2
-                sq2Eat = int(d.pickRandomAvailableSquareToEat())
-                d.eat(sq2Eat, player)
-                player1In = not player1In
-            p1Wins += player-1
-        print('Player 1 won {} times out of {} games'.format(p1Wins, nGames))
-    # with entirely random play, there seems to be no advantage to going first
-    #
-    #
-    #    print('\n\n\n')
-    #    # game against a human opponent
-    #    d = bar()
-    #    player = 1
-    #    player1In=True
-    #    while d.finished == False:
-    #        if player1In: # PC always goes first
-    #            sq2Eat = int(d.pickRandomAvailableSquareToEat())
-    #            d.eat(sq2Eat, 1)
-    #            player1In = False
-    #        else:
-    #            player = 2
-    #            d.show()
-    #            print(d.eaten)
-    #            q = input('Which square would you like to go in?')
-    #            q = int(q)
-    #            d.eat(q, 2)
-    #            player1In = True
+    q = Bar()
+    q.play('human', display=True)
 
-    #    if False:
-    #        d = bar()
-    #        go = True
-    #        gameIdx = 0
-    #        gameList = []
-    #        recordList = []
-    #        while go:
-    #            d.playHuman()
-    #            gameList.append(gameIdx)
-    #            recordList.append(d.record())
-    #            gameIdx += 1
-    #            raw = input('Hit Enter to go again, type anything to quit: ')
-    #            if len(raw) != 0:
-    #                go = False
-    #        plt.figure(1)
-    #        plt.plot(gameList, recordList, 'k-')
-    #        plt.show()
+# q.load('50GamesHuman.pkl')  #
 
-    e = Bar(rows=3,
-            cols=4,
-            bounty=3,
-            maxBeads=2,
-            minBeads=2)  # this is default
-    gameIdx = 0
-    gameList = []
-    recordList = []
-    w = []
-    for i in range(2000):  # simulate games against random opposition
-        w.append(e.play('random', display=False))
-        gameList.append(gameIdx)
-        recordList.append(e.record())
-        gameIdx += 1
 
-    plt.figure(4)
-    plt.plot(gameList, recordList, '-')
-    plt.xlabel('Time')
-    plt.ylabel('Probability of win')
-    plt.title('Training against Random opposition')
-    # e.save('2000GamesRandom.pkl')
-    e.showBoxChoices()
-
-    f = Bar(maxBeads=6)
-    gameIdx = 0
-    gameList = []
-    recordList = []
-    w = []
-    for i in range(2000):  # simulate against intelligent opposition
-        w.append(f.play('intelligent', display=False))
-        gameList.append(gameIdx)
-        recordList.append(f.record())
-        gameIdx += 1
-
-    plt.figure(5)
-    plt.plot(gameList, recordList, '-')
-    plt.xlabel('Time')
-    plt.ylabel('Probability of win')
-    plt.title('Dual Phase Training')
-    # f.save('2000GamesIntelligent.pkl')
-    f.showBoxChoices()
+#  Auto games  # uncomment for automation
+#    e = Bar(rows=3,
+#            cols=4,
+#            bounty=3,
+#            maxBeads=2,
+#            minBeads=2)  # this is default
+#    gameIdx = 0
+#    gameList = []
+#    recordList = []
+#    w = []
+#    for i in range(2000):  # simulate games against random opposition
+#        w.append(e.play('random', display=False))
+#        gameList.append(gameIdx)
+#        recordList.append(e.record())
+#        gameIdx += 1
+#
+#    plt.figure(4)
+#    plt.plot(gameList, recordList, '-')
+#    plt.xlabel('Time')
+#    plt.ylabel('Probability of win')
+#    plt.title('Training against Random opposition')
+#    # e.save('2000GamesRandom.pkl')
+#    e.showBoxChoices()
+#
+#    f = Bar(maxBeads=6)
+#    gameIdx = 0
+#    gameList = []
+#    recordList = []
+#    w = []
+#    for i in range(2000):  # simulate against intelligent opposition
+#        w.append(f.play('intelligent', display=False))
+#        gameList.append(gameIdx)
+#        recordList.append(f.record())
+#        gameIdx += 1
+#
+#    plt.figure(5)
+#    plt.plot(gameList, recordList, '-')
+#    plt.xlabel('Time')
+#    plt.ylabel('Probability of win')
+#    plt.title('Dual Phase Training')
+#    # f.save('2000GamesIntelligent.pkl')
+#    f.showBoxChoices()
