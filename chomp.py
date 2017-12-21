@@ -4,6 +4,8 @@ import pickle
 from copy import deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter.filedialog import askopenfilename
 
 
 class Bar(object):
@@ -58,8 +60,7 @@ class Bar(object):
                    percentage.
         save(filename) : Saves the current box array to a file 'filename'
         load(filename) : Loads a box array from the file 'filename'
-        playHuman() : Play chomp against a human competitor.
-        playRandom() : Play chomp against a random adversary.
+        play(opponent) : Play chomp - opponent = 'human'|'random'|'intelligent'
 
 
     Example: Generate a 3x4 bar, Let Players 1 and 2 eat a bit, then show the
@@ -94,7 +95,7 @@ class Bar(object):
         Out: array([3, 2, 2, 0])
 
     """
-    def __init__(self, rows=3, cols=4, bounty=3, maxBeads=2, minBeads=2):
+    def __init__(self, rows=3, cols=4, bounty=3, maxBeads=2, minBeads=1):
         self.rows = rows
         self.cols = cols
         self.eaten = np.zeros([rows, cols], dtype=int)
@@ -304,11 +305,15 @@ class Bar(object):
 
     def record(self):
         """Prints the game-win record and returns the win percentage"""
+        try:
+            per = (self.gamesWon/self.gamesPlayed)*100
+        except ZeroDivisionError:
+            per = 0
         print('PC has won {} of {} games - {:.0f} percent'.format(
             self.gamesWon,
             self.gamesPlayed,
-            (self.gamesWon/self.gamesPlayed)*100))
-        return self.gamesWon/self.gamesPlayed
+            per))
+        return per
 
     def save(self, filename):
         """Pickles the current array of box objects"""
@@ -471,7 +476,7 @@ class Box(object):
         replenish - add beads to winning moves
     '''
 
-    def __init__(self, desc, rows=3, cols=4, bounty=3, maxBeads=2, minBeads=2):
+    def __init__(self, desc, rows, cols, bounty, maxBeads, minBeads):
         self.desc = np.squeeze(desc)  # to ensure a single dimensional array
         self.cols = cols
         self.rows = rows
@@ -511,7 +516,7 @@ class Box(object):
         '''
         maxSum = self.rows * self.cols
         totalSquaresLeft = np.sum(self.desc)
-        return np.ceil(np.interp(
+        return np.round(np.interp(
             totalSquaresLeft, [0, maxSum],
             [self.minBeads, self.maxBeads])).astype(int)
 
@@ -535,10 +540,59 @@ class Box(object):
         self.moveDict[winningMove] += self.bounty
 
 
-if __name__ == '__main__':
+def menu():
+    playChoice = input('What would you like to do: \n'
+                       '1: Play Chomp against the machine \n'
+                       '2: Train the machine against itself \n'
+                       '3: Save the machine\'s state \n'
+                       '4: Load a state from a file \n'
+                       '5: View the machine\'s stats \n'
+                       '0: Quit \n'
+                       '> ')
+    try:
+        playChoice = int(playChoice)
+        if playChoice in [1, 2, 3, 4, 5, 0]:
+            return playChoice
+        else:
+            return -1
+    except ValueError:
+        print('Unknown menu Choice')
+        return -1
 
-    q = Bar()
-    q.play('human', display=True)
+
+if __name__ == '__main__':
+    w = []  # win log
+    b = Bar()  # create bar
+    loop = True
+    while loop:
+        choice = menu()
+        if choice == 1:
+            playLoop = True  # keep playing
+            while playLoop:
+                w.append(b.play('human', display=True))
+                q = input('Play Again? ([y]/n) ')
+                if q == 'n':
+                    playLoop = False
+        elif choice == 2:
+            for i in range(10000):
+                b.play('random', display=False)
+            print('Trained')
+        elif choice == 3:
+            fname = input('Type the filename to save')
+            b.save(fname)
+        elif choice == 4:
+            filename = askopenfilename()  # show an "Open" dialog box
+            b.load(filename)
+        elif choice == 5:
+            b.show()
+            b.record()
+            b.showBoxChoices()
+            plt.show()
+        elif choice == 0:
+            loop = False  # exit
+        else:
+            pass
+
 
 # q.load('50GamesHuman.pkl')  #
 
