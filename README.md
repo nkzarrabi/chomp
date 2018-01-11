@@ -8,7 +8,7 @@ With 3 rows and 4 columns, the game has a total of 34 states, which makes it a c
 
 The 50GamesHuman.pkl file contains the state of the machine after 50 games against a human, starting with 2 beads in each box. The 2000Games#.pkl files contain the machine state after facing a random opponent, or another 'intelligent' opponent using the same strategy.
 
-![State transition probability diagram](ProbChooseSquareHuman.png)
+![State transition probability diagram](prob-diagrams/ProbChooseSquareHuman.png)
 This image shows the relative probability of choosing a square on a colour scale, after 50 training games against a human. White squares cannot be played (they are already eaten, or they are the poisoned top-left square). State 34 (lower right corner of the image) is the starting state of the game. The program has determined that playing in square number 8 (1st column, 3rd row) is the best first move.
 
 This may turn into an NGCM outreach demonstration if it turns out to be successful.
