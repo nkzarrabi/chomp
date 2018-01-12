@@ -11,6 +11,7 @@ Parts drawers - min 34 compartments.
     90x65x55 mm external http://www.staples.co.uk/0-14-litre-storage-box/cbs/297609034.html?promoCode=&Effort_Code=WW&Find_Number=297609034&m=0&isSubscription=False
     120x85x65 mm external http://www.staples.co.uk/0-3-litre-box-business-cards-office-accessories-clear/cbs/297720009.html?promoCode=&Effort_Code=WW&Find_Number=297720009&m=0&isSubscription=False
     *** 90x65x35 mm external http://www.staples.co.uk/plastic-storage/cbs/297789604.html?promoCode=&Effort_Code=WW&Find_Number=297789604&m=0&isSubscription=False
+  - Labels for the box lids / fronts showing the patterns of the game.
 
 
 Beads - other move indicators - 11 distinguishable colours needed
@@ -35,6 +36,7 @@ Something to represent the chocolate bar which people take chomps out of
   - Quite fun to have large scale - perhaps A3 size?
   - Must be hard wearing / easy to move around.
   - Brown 5 mm acrylic sheet - 12 squares laser cut out / engraved? https://www.sheetplastics.co.uk/5mm-brown-acrylic-297-x-420-a3.html
+  - 3D Printed squares? Dan can potentially make at home 
 
 Publicity
   - a big poster with the rules of the game, something snappy about not needing a machine for machine learning.
