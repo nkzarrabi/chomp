@@ -104,6 +104,7 @@ class Bar(object):
         self.boxes = self.getBoxes(bounty, maxBeads, minBeads)
         self.gamesPlayed = 0
         self.gamesWon = 0
+        self.nextStateList = self.produceListNextState()
 
     def resetEaten(self):
         """Resets the self.eaten array to all zeros"""
@@ -352,6 +353,31 @@ class Bar(object):
             plt.ylabel('State {}'.format(i))
             plt.colorbar()
 
+    def setState(self, n):
+        """Sets the bar into a defined state n"""
+        boolRep = self.enumerateStates()[n]
+        eatenArray = np.reshape(boolRep, (self.rows, self.cols)).astype('int')
+        self.eaten = eatenArray
+
+    def produceListNextState(self):
+        """Returns a list of 3-element tuples: (from state, move, to State)
+        to help us with picking up boxes"""
+        outList = []
+        # first loop - starting positions
+        for pos in range(1, len(self.boxes)):
+            # pos is the starting position
+            self.setState(pos)
+#            print('Current state is {}'.format(pos))
+#            self.showUnicode()
+            for move in range(1, self.rows*self.cols):
+                self.setState(pos)
+#                print('Trying Move {}'.format(move))
+                self.eat(move, 1)
+                newPos = self.recogniseState()
+                if pos != newPos:
+                    outList.append((pos, move, newPos))
+        return outList
+
     def play(self, opponent, display=False):
         """Play the game of Chomp against an opponent
         Generalised - takes argument 'opponent' to face either
@@ -451,11 +477,11 @@ class Bar(object):
         else:  # the opponent wins
             if display:
                 print('OPPONENT WINS -'
-                      'Computer gets no bonus for being beaten!')
-            # winPositionList = positionList[1::2]
-            winPositionList = []
-            # winMoveList = humanMoveList
-            winMoveList = []
+                      'But Chomp learns from its mistakes!')
+            winPositionList = positionList[1::2]
+#            winPositionList = []
+            winMoveList = opponentMoveList
+#            winMoveList = []
         for move, position in zip(winMoveList, winPositionList):
             if display:
                 print('Boosting move {} in box {}'.format(move, position))
