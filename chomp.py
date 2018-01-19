@@ -341,6 +341,13 @@ class Bar(object):
             grid = np.reshape(grid, [rows, cols])
             return grid
 
+        # display part
+        bx = self.boxes
+        for i, box in enumerate(bx):
+            print('State {},'.format(i), end='')
+            print(box)
+
+        # plotting part
         nStates = len(self.allStates)
         sz = np.ceil(np.sqrt(nStates))
         plt.figure()
@@ -352,6 +359,7 @@ class Bar(object):
                        cmap='viridis', vmin=0, vmax=1)
             plt.ylabel('State {}'.format(i))
             plt.colorbar()
+        plt.show()
 
     def setState(self, n):
         """Sets the bar into a defined state n"""
@@ -613,7 +621,6 @@ if __name__ == '__main__':
             b.show()
             b.record()
             b.showBoxChoices()
-            plt.show()
         elif choice == 0:
             loop = False  # exit
         else:
