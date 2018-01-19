@@ -95,7 +95,7 @@ class Bar(object):
         Out: array([3, 2, 2, 0])
 
     """
-    def __init__(self, rows=3, cols=4, bounty=3, maxBeads=2, minBeads=1):
+    def __init__(self, rows=3, cols=4, bounty=3, maxBeads=3, minBeads=1):
         self.rows = rows
         self.cols = cols
         self.eaten = np.zeros([rows, cols], dtype=int)
@@ -498,7 +498,7 @@ class Box(object):
         repr - prints the dictionary
         populate - initialise internal dictionary with the right number moves
         distribution - calculates the number of beads to start in each box
-        draw - return a move or -1 for resignnerate a list of Box objects
+        draw - return a move or -1 for resign
         replenish - add beads to winning moves
     '''
 
@@ -562,7 +562,7 @@ class Box(object):
         return selected
 
     def replenish(self, winningMove):
-        '''Adds to the dictionary the list of moves which won the game'''
+        '''Adds to the dictionary with key winningMove by the bounty amount'''
         self.moveDict[winningMove] += self.bounty
 
 
@@ -601,10 +601,10 @@ if __name__ == '__main__':
                     playLoop = False
         elif choice == 2:
             for i in range(10000):
-                b.play('random', display=False)
+                b.play('intelligent', display=False)
             print('Trained')
         elif choice == 3:
-            fname = input('Type the filename to save')
+            fname = input('Type the filename to save: ')
             b.save(fname)
         elif choice == 4:
             filename = askopenfilename()  # show an "Open" dialog box
