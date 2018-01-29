@@ -1,0 +1,6 @@
+to resize, run this on the folder above
+
+find -maxdepth 1 -iname "*.png" | xargs -L1 -I{} convert -units PixelsPerInch -density 360 "{}" res/"{}"
+
+360 is your set-screw
+

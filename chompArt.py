@@ -15,14 +15,15 @@ a = Bar()
 states = a.allStates
 r = a.rows
 c = a.cols
-sqr = sp.misc.imread('Art/square.jpg')
-bad = sp.misc.imread('Art/badSquare.jpg')
-pixSize = sqr.shape[0]
-imageArray = np.ones([r*pixSize, c*pixSize, sqr.shape[2]])
-sp.misc.imsave('Art/0.jpg',imageArray)
+sqr = sp.misc.imread('Art/ngcmSquare.png')
+bad = sp.misc.imread('Art/ngcmBadSquare.png')
+pixh = sqr.shape[0]
+pixv = sqr.shape[1]
+imageArray = np.ones([r*pixh, c*pixv, sqr.shape[2]])
+sp.misc.imsave('Art/ngcm0.png', imageArray)
 for i, state in enumerate(states):
     state = np.reshape(state, [r, c])
-    imageArray = np.ones([r*pixSize, c*pixSize, sqr.shape[2]])
+    imageArray = np.ones([r*pixh, c*pixv, sqr.shape[2]])
     for j in range(r):
         for k in range(c):
             if (j == 0 and k == 0):
@@ -30,6 +31,6 @@ for i, state in enumerate(states):
             else:
                 img = sqr
             if not state[j, k]:
-                imageArray[j*pixSize:(j+1)*pixSize,
-                           k*pixSize:(k+1)*pixSize, :] = img
-                sp.misc.imsave('Art/{}.jpg'.format(i), imageArray)
+                imageArray[j*pixh:(j+1)*pixh,
+                           k*pixv:(k+1)*pixv, :] = img
+                sp.misc.imsave('Art/ngcm{}.png'.format(i), imageArray)
