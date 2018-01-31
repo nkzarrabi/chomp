@@ -105,6 +105,7 @@ class Bar(object):
         self.gamesPlayed = 0
         self.gamesWon = 0
         self.nextStateList = self.produceListNextState()
+        self.lookup = self.moveNumberToColour()
 
     def resetEaten(self):
         """Resets the self.eaten array to all zeros"""
@@ -366,6 +367,28 @@ class Bar(object):
         boolRep = self.enumerateStates()[n]
         eatenArray = np.reshape(boolRep, (self.rows, self.cols)).astype('int')
         self.eaten = eatenArray
+
+    def printListNextState(self):
+        """Prints to the screen a list of state transition"""
+        for i in range(len(self.nextStateList)):
+            print('{} {} {}'.format(self.nextStateList[i][0],
+                  self.lookup[self.nextStateList[i][1]],
+                  self.nextStateList[i][2]))
+
+    def moveNumberToColour(self):
+        """Returns the mapping between move numbers and bead colours
+        as a dictionary"""
+        return {1: 'Red',
+                2: 'Orange',
+                3: 'Yellow',
+                4: 'Green',
+                5: 'Blue',
+                6: 'Purple',
+                7: 'Pink',
+                8: 'Black',
+                9: 'Grey',
+                10: 'White',
+                11: 'Tan'}
 
     def produceListNextState(self):
         """Returns a list of 3-element tuples: (from state, move, to State)
