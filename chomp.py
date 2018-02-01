@@ -42,12 +42,14 @@ class Bar(object):
         convertBooleanToDescription(boolRep) : Converts from boolean
                                                representation to shorthand
                                                description
-        show() : Displays a graphical bar with numbered cells.
         getallStatesFromCSV() : DEPRECATED - receive all states of 3x4
                                 bar from a CSV file
         recogniseState() : Find the index of self.allStates which
                               corresponds with the current bar state
         show() : Prints a graphical bar with numbered cells to the screen.
+        showUnicode() : Prints a graphical bar using unicode boxes.
+        showEaten(): Prints a representation of which parts
+                     of the bar have been eaten
         eat(n, player) : Eats square n and all squares lower and to the right.
                          player argument is to tag squares (for further
                          graphics enhancements)
@@ -60,7 +62,16 @@ class Bar(object):
                    percentage.
         save(filename) : Saves the current box array to a file 'filename'
         load(filename) : Loads a box array from the file 'filename'
-        play(opponent) : Play chomp - opponent = 'human'|'random'|'intelligent'
+        showBoxChoices() : graphically show the chance of choosing a
+                           particular move based on the current state
+        setState(n): Sets the bar into a defined state with number n
+        printListNextState(): Prints to the screen a list of state transitions
+        moveNumberToColour(): Produces a dictionary which maps from move number
+                              to the colour of the beads.
+        produceListNextState(): Generates the list of state transitions
+        produceLoadSheet(): Print to the screen what to place into each box
+        play(opponent, [display]) : Play chomp.
+                                    opponent = 'human'|'random'|'intelligent'
 
 
     Example: Generate a 3x4 bar, Let Players 1 and 2 eat a bit, then show the
@@ -102,6 +113,7 @@ class Bar(object):
         self.allStates = self.enumerateStates()
         self.finished = False  # game over if this is True
         self.boxes = self.getBoxes(bounty, maxBeads, minBeads)
+        self.originalBoxes = deepcopy(self.boxes)
         self.gamesPlayed = 0
         self.gamesWon = 0
         self.nextStateList = self.produceListNextState()
@@ -408,6 +420,15 @@ class Bar(object):
                 if pos != newPos:
                     outList.append((pos, move, newPos))
         return outList
+
+    def produceLoadSheet(self):
+        """Print to the screen what to place into each box"""
+        for i, bx in enumerate(self.originalBoxes):
+            print('In Box {}: '.format(i), end='')
+            for key in bx.moveDict:
+                print('{}x'.format(bx.moveDict[key]), end='')
+                print('{}, '.format(self.lookup[key]), end='')
+            print(' ')
 
     def play(self, opponent, display=False):
         """Play the game of Chomp against an opponent
