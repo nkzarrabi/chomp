@@ -492,6 +492,34 @@ class Bar(object):
         else:
             raise NameError('Unknown Opponent')
 
+        # if playing a human, ask if they want to go first
+        if opponent.lower() == 'human':
+            ask = True
+            while ask:
+                whofirst = input('Who plays first? 1 for Chomp, 2 for Human: ')
+                try:  # validation of input
+                    if int(whofirst) in [1, 2]:
+                        whofirst = int(whofirst)
+                        ask = False
+                    else:
+                        ask = True
+                except ValueError:
+                    print('Invalid')
+                    ask = True
+        else:
+            whofirst = 1  # otherwise chomp first
+
+        if whofirst == 2:        # human player (opponent) goes first
+            current = self.recogniseState()
+            positionList.append(current)
+            move = moveFcn()
+            if move == -1:  # Opponent resigns
+                self.finished = True
+                winner = 1  # other player wins
+            else:  # Opponent plays
+                self.eat(move, 2)
+                opponentMoveList.append(move)
+
         while self.finished is False:
             # PC part
             current = self.recogniseState()  # get current state
@@ -523,14 +551,20 @@ class Bar(object):
         if winner == 1:  # the computer wins
             if display:
                 print('THE COMPUTER WINS'.format(winner))
-            winPositionList = positionList[::2]
+            if whofirst == 1:
+                winPositionList = positionList[::2]
+            else:
+                winPositionList = positionList[1::2]
             winMoveList = pcMoveList
             self.gamesWon += 1
         else:  # the opponent wins
             if display:
                 print('OPPONENT WINS -'
                       'But Chomp learns from its mistakes!')
-            winPositionList = positionList[1::2]
+            if whofirst == 1:  # if chomp went first
+                winPositionList = positionList[1::2]
+            else:
+                winPositionList = positionList[::2]
 #            winPositionList = []
             winMoveList = opponentMoveList
 #            winMoveList = []
