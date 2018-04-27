@@ -14,12 +14,12 @@ winstr = 'lwlllll\
           wlwlwlw\
           wlwlwlw\
           wlwlwww\
-          lwlwlwl\S
+          lwlwlwl\
           wwwllw'
 
           # this string of wins is not exact! taken from graph
 
-for j in range(4,10):
+for j in range(7,8):
 
     setSize = j # games per set
 
@@ -49,5 +49,9 @@ for j in range(4,10):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.pcolor(d)
+    plt.xlabel('Time')
     ax.xaxis.set_ticks(np.arange(0,sets))
+    ax.xaxis.set_ticklabels('')
     ax.grid(True)
+    plt.text(0,7.1,'Human Wins per set (Purple)  ↓')
+    plt.text(0,-0.4,'Chomp Wins per set (Yellow) ↑')

@@ -338,6 +338,7 @@ class Bar(object):
         """Retrieves an array of box objects"""
         with open(filename, 'rb') as f:
             boxData = pickle.load(f)
+            print('Loaded pickled file of type {}'.format(type(boxData)))
             self.boxes = boxData
 
     def showBoxChoices(self):
