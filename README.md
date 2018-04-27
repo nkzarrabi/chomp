@@ -6,6 +6,8 @@
 
 With 3 rows and 4 columns, the game has a total of 34 states, which makes it a candidate for a simple machine-learning demonstration, in the same vein as the [MENACE](https://github.com/mscroggs/MENACE) machine.
 
+Clone the repository and run chomp.py to run a simulation of chomp.
+
 The 50GamesHuman.pkl file contains the state of the machine after 50 games against a human, starting with 2 beads in each box. The 2000Games#.pkl files contain the machine state after facing a random opponent, or another 'intelligent' opponent using the same strategy. perfect.pkl is almost certain to win when playing first.
 
 ![State transition probability diagram](prob-diagrams/ProbChooseSquareIntelligent.png)
@@ -15,6 +17,6 @@ The physical version of Chomp, which uses plastic containers filled with coloure
 
 ![Chomp at the Bringing Research to Life Roadshow](Art/THS.jpg)
 
-Including a short training period for three demonstrators to learn how to host the game, 76 games were played, in sets of seven. The results were marked on the chart below, with human wins marked from the top of the diagram and chomp wins from the bottom. The plot shows Chomp wins more games over time.  
+Including a short training period for three demonstrators to learn how to host the game, 76 games were played, in sets of seven. The results were marked on the chart below, with human wins marked from the top of the diagram and chomp wins from the bottom. The plot shows that over time chomp learns how to play and win.  
 
 ![Chomp's win record](Results/TrainingRecord.png)
