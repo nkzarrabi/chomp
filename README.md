@@ -17,6 +17,6 @@ The physical version of Chomp, which uses plastic containers filled with coloure
 
 ![Chomp at the Bringing Research to Life Roadshow](Art/THS.jpg)
 
-Including a short training period for three demonstrators to learn how to host the game, 76 games were played, in sets of seven. The results were marked on the chart below, with human wins marked from the top of the diagram and chomp wins from the bottom. The plot shows that over time chomp learns how to play and win.  
+Including a short training period for three demonstrators to learn how to host the game, 98 games were played, in sets of seven. The results were marked on the chart below, with human wins marked from the top of the diagram and chomp wins from the bottom. The plot shows that over time chomp learns how to play and win.  
 
-![Chomp's win record](Results/TrainingRecord.png)
+![Chomp's win record](Results/Grid-V1.png)
