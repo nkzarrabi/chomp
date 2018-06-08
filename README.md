@@ -21,5 +21,7 @@ Including a short training period for three demonstrators to learn how to host t
 
 ![Chomp's win record](Results/Grid-V1.png)
 
-Chomp was reset then taken to Cheltenham Science Festival for two days. We played 143 games over this time and saw Chomp learning somewhat more erratically this time, representative of learning non-optimal strategies from its opponents, which it had to forget in order to progress.
+Chomp was reset then taken to [Cheltenham Science Festival](https://www.cheltenhamfestivals.com/science) for two days. We played 143 games over this time and saw Chomp learning somewhat more erratically this time, representative of learning non-optimal strategies from its opponents, which it had to forget in order to progress.
 ![Chomp at Cheltenham Science Festival](Results/Grid-CSF.png)
+![James and Ed teach the machine](Art/Conversation.png)
+![Pepper takes a look at Chomp](Art/Pepper.png)
