@@ -25,3 +25,7 @@ Chomp was reset then taken to [Cheltenham Science Festival](https://www.cheltenh
 ![Chomp at Cheltenham Science Festival](Results/Grid-CSF.png)
 ![James and Ed teach the machine](Art/Conversation.png)
 ![Pepper takes a look at Chomp](Art/Pepper.png)
+
+Chomp's next outing was at the [Southampton Science and Engineering Day](http://www.sotsef.co.uk/science_&_engineering_day/). Over the day, we played 86 games, learning steadily from a win-rate of 1/7 to 6/7 over the day.
+
+![Chomp at Southampton Science and Engineering Day](Results/Grid_SOTSEF.png)
