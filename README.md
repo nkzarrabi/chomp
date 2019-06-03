@@ -36,4 +36,4 @@ We were invited to [Winchester Science Centre](https://www.winchestersciencecent
 
 It's safe to say that Chomp is a winner!
 
-![Chomp on the top step of the podium at Winchester Science Centre](Art/podium.png)
+![Chomp on the top step of the podium at Winchester Science Centre](Art/podium.jpg)
