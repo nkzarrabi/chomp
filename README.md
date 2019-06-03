@@ -29,3 +29,11 @@ Chomp was reset then taken to [Cheltenham Science Festival](https://www.cheltenh
 Chomp's next outing was at the [Southampton Science and Engineering Day](http://www.sotsef.co.uk/science_&_engineering_day/). Over the day, we played 86 games, learning steadily from a win-rate of 1/7 to 6/7 over the day.
 
 ![Chomp at Southampton Science and Engineering Day](Results/Grid_SOTSEF.png)
+
+We were invited to [Winchester Science Centre](https://www.winchestersciencecentre.org/) and had a great time. This time we asked everyone who played to give us a one word review - we've compiled them into a Wordle.
+
+![Wordle of Chomp reviews after Winchester Science Centre Visit](Art/wordle.png)
+
+It's safe to say that Chomp is a winner!
+
+![Chomp on the top step of the podium at Winchester Science Centre](Art/podium.png)
