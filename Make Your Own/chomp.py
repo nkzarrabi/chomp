@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
+import fickling
 
 
 class Bar(object):
@@ -337,7 +338,7 @@ class Bar(object):
     def load(self, filename):
         """Retrieves an array of box objects"""
         with open(filename, 'rb') as f:
-            boxData = pickle.load(f)
+            boxData = fickling.load(f)
             print('Loaded pickled file of type {}'.format(type(boxData)))
             self.boxes = boxData
 
